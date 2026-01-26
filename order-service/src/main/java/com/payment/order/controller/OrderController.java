@@ -1,8 +1,8 @@
-package com.ruqsana.payments.controller;
+package com.payment.order.controller;
 
-import com.ruqsana.payments.dto.OrderRequest;
-import com.ruqsana.payments.entity.Order;
-import com.ruqsana.payments.service.OrderService;
+import com.payment.order.dto.OrderRequest;
+import com.payment.order.entity.Order;
+import com.payment.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

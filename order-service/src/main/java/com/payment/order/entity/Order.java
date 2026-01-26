@@ -1,6 +1,6 @@
-package com.ruqsana.payments.entity;
+package com.payment.order.entity;
 
-import com.ruqsana.payments.utils.OrderStatus;
+import com.payment.order.utils.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

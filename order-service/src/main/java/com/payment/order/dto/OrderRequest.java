@@ -1,4 +1,4 @@
-package com.ruqsana.payments.dto;
+package com.payment.order.dto;
 
 import lombok.Getter;
 import lombok.Setter;

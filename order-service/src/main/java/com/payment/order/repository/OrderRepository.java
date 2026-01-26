@@ -1,6 +1,6 @@
-package com.ruqsana.payments.repository;
+package com.payment.order.repository;
 
-import com.ruqsana.payments.entity.Order;
+import com.payment.order.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

@@ -1,9 +1,9 @@
-package com.ruqsana.payments.service;
+package com.payment.order.service;
 
-import com.ruqsana.payments.dto.OrderRequest;
-import com.ruqsana.payments.entity.Order;
-import com.ruqsana.payments.repository.OrderRepository;
-import com.ruqsana.payments.utils.OrderStatus;
+import com.payment.order.dto.OrderRequest;
+import com.payment.order.entity.Order;
+import com.payment.order.repository.OrderRepository;
+import com.payment.order.utils.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
