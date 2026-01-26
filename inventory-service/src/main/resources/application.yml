@@ -1,0 +1,25 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: inventory-service
+
+  datasource:
+    url: jdbc:h2:mem:inventorydb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    defer-datasource-initialization: true # Force data.sql to wait until JPA has created the tables
+    hibernate:
+      ddl-auto: update # Ensure Hibernate is set to create/update the schema
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  # 1. Enable the console
+  h2:
+    console:
+      enabled: true
+      path: /h2-console  # Spring boot 4+ is not working with H2
