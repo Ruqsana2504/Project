@@ -34,7 +34,7 @@ public class InventoryServiceTest {
 
         Runnable task = () -> {
             try {
-                boolean result = inventoryService.reserveStock("P1", 1);
+                boolean result = inventoryService.reserveStock("P1", 3);
                 System.out.println("Reservation result: " + result);
             } finally {
                 countDownLatch.countDown();

@@ -141,9 +141,6 @@ Called from another Spring bean
 this.reserveStock();
 
 
-Interviewers LOVE this detail.
-
-🧠 Interview-Perfect Answer
 
 “Without @Transactional, inventory updates are not atomic, leading to race conditions, overselling, and inconsistent state.
 @Transactional ensures isolation and rollback, which is critical in payment and inventory systems.”
