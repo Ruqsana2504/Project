@@ -24,7 +24,7 @@ public class InventoryService {
 
         inventory.setAvailableQuantity(inventory.getAvailableQuantity() - quantity);
 
-        inventoryRepository.save(inventory);
+//        inventoryRepository.save(inventory);
         return true;
     }
 

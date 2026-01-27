@@ -3,16 +3,13 @@ package com.payment.inventory.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Version;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "inventory")
 public class Inventory {
 
@@ -20,5 +17,17 @@ public class Inventory {
     private String productId;
 
     private int availableQuantity;
+
+    @Version
+    private Long version;
+
+    public Inventory() {
+
+    }
+
+    public Inventory(String productId, int availableQuantity) {
+        this.productId = productId;
+        this.availableQuantity = availableQuantity;
+    }
 
 }

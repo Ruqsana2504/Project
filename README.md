@@ -303,3 +303,236 @@ Name: Ruqsana Begum
 LinkedIn: https://linkedin.com/in/ruqsanabegum2504
 
 GitHub: https://github.com/Ruqsana2504
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PHASE 2 — Inventory Service (Day 3)
+🎯 Goal
+
+Stock reservation & release.
+
+Build
+
+REST API:
+
+POST /inventory/reserve
+
+POST /inventory/release
+
+Stock locking using:
+
+Optimistic locking
+
+States:
+
+AVAILABLE → RESERVED
+
+Concepts
+
+Concurrency handling
+
+Optimistic vs pessimistic locks
+
+Deliverable
+
+✅ Inventory safely reserved/released
+
+🔁 PHASE 3 — Saga Orchestrator (Day 4–5)
+🎯 Goal
+
+Distributed transaction control.
+
+Build
+
+Saga state machine
+
+Calls:
+
+Order → Inventory → Payment
+
+Compensation logic
+
+Concepts
+
+Saga pattern
+
+Compensating transactions
+
+Failure handling
+
+Deliverable
+
+✅ Order + Inventory consistency guaranteed
+
+💳 PHASE 4 — Payment Service (Day 6–7)
+🎯 Goal
+
+Secure payment simulation.
+
+Build
+
+Payment API:
+
+POST /payments
+
+States:
+
+INITIATED → SUCCESS / FAILED
+
+
+Idempotency key
+
+Retry & timeout simulation
+
+Concepts
+
+Payment lifecycle
+
+Idempotency
+
+Retry safety
+
+Deliverable
+
+✅ Safe, retryable payment processing
+
+📒 PHASE 5 — Ledger Service (Day 8)
+🎯 Goal
+
+Financial correctness (BIG differentiator).
+
+Build
+
+Double-entry ledger
+
+Immutable transactions
+
+Balance derivation
+
+Concepts
+
+Accounting fundamentals
+
+Immutability
+
+Deliverable
+
+✅ Ledger-backed balances
+
+🔐 PHASE 6 — Security (Day 9–10)
+🎯 Goal
+
+Production-grade security.
+
+Build
+
+OAuth2 + JWT
+
+RBAC
+
+AES encryption
+
+Tokenization mock
+
+Concepts
+
+Auth vs AuthZ
+
+Zero trust
+
+Deliverable
+
+✅ Secure APIs
+
+⚡ PHASE 7 — Redis & Performance (Day 11)
+🎯 Goal
+
+Scale & speed.
+
+Build
+
+Redis caching
+
+Rate limiting
+
+Idempotency cache
+
+Concepts
+
+Cache strategies
+
+Distributed counters
+
+Deliverable
+
+✅ High-performance APIs
+
+🧪 PHASE 8 — Resilience & Testing (Day 12)
+🎯 Goal
+
+Failure-ready system.
+
+Build
+
+Circuit breakers
+
+Retries
+
+Integration tests
+
+Concepts
+
+Fault tolerance
+
+Graceful degradation
+
+Deliverable
+
+✅ Resilient microservices
+
+🐳 PHASE 9 — Docker & Deployment (Day 13)
+🎯 Goal
+
+Production-ready deployment.
+
+Build
+
+Dockerfiles
+
+Docker Compose
+
+Environment configs
+
+Deliverable
+
+✅ One-command startup
+
+📘 PHASE 10 — README & Interview Prep (Day 14)
+🎯 Goal
+
+Sell the project.
+
+Build
+
+Polished README
+
+Architecture diagram
+
+Interview stories
+
+Deliverable
+
+✅ Resume-ready project

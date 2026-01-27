@@ -147,3 +147,27 @@ this.reserveStock();
 
 
 # Spring boot 4+ is not working with H2
+
+Why Optimistic Locking (Quick Reminder)
+No DB row lock
+High throughput
+Detects conflicts instead of blocking
+Perfect when collisions are rare (e-commerce)
+
+Hibernate adds version to WHERE clause during update
+If version changed → update fails
+Prevents lost updates
+
+UPDATE inventory
+SET available_quantity = ?, version = version + 1
+WHERE product_id = ? AND version = ?
+
+If another transaction updated it first:
+rows affected = 0
+Hibernate throws OptimisticLockException
+
+We used optimistic locking with a version column to prevent lost updates during concurrent inventory reservations,
+validated using multithreaded integration tests
+
+Optimistic locking works only across transactions.
+Annotating the test with @Transactional caused all threads to share one transaction, so locking didn’t trigger.

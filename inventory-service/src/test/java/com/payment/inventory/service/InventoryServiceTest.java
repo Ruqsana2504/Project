@@ -2,16 +2,20 @@ package com.payment.inventory.service;
 
 import com.payment.inventory.entity.Inventory;
 import com.payment.inventory.repository.InventoryRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@ActiveProfiles("test")
 public class InventoryServiceTest {
 
     @Autowired
@@ -20,9 +24,19 @@ public class InventoryServiceTest {
     @Autowired
     InventoryService inventoryService;
 
+    @Autowired
+    EntityManager entityManager;
+
     @BeforeEach
     public void setup() {
-        inventoryRepository.save(new Inventory("P1", 5));
+        inventoryRepository.deleteAll();
+        inventoryRepository.flush();
+        entityManager.clear();
+
+        // data.sql is also executing so it is showing PK error.
+        // Either comment this line or add spring.sql.init.mode=never in application-test.yml
+//        inventoryRepository.saveAndFlush(new Inventory("P1", 5));
+
     }
 
     @Test
@@ -34,8 +48,10 @@ public class InventoryServiceTest {
 
         Runnable task = () -> {
             try {
-                boolean result = inventoryService.reserveStock("P1", 3);
-                System.out.println("Reservation result: " + result);
+                boolean result = inventoryService.reserveStock("P1", 2);
+                System.out.println(Thread.currentThread().getName() + " result = " + result);
+            } catch (ObjectOptimisticLockingFailureException e) {
+                System.out.println(Thread.currentThread().getName() + " failed due to optimistic lock");
             } finally {
                 countDownLatch.countDown();
             }
