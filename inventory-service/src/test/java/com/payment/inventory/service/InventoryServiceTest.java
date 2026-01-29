@@ -1,70 +1,77 @@
 package com.payment.inventory.service;
 
-import com.payment.inventory.entity.Inventory;
 import com.payment.inventory.repository.InventoryRepository;
-import jakarta.persistence.EntityManager;
+import jakarta.persistence.OptimisticLockException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 public class InventoryServiceTest {
 
-    @Autowired
+    @Mock
+    InventoryTxnService inventoryTxnService;
+
+    @Mock
     InventoryRepository inventoryRepository;
 
-    @Autowired
+    @InjectMocks
     InventoryService inventoryService;
-
-    @Autowired
-    EntityManager entityManager;
 
     @BeforeEach
     public void setup() {
-        inventoryRepository.deleteAll();
-        inventoryRepository.flush();
-        entityManager.clear();
-
-        // data.sql is also executing so it is showing PK error.
-        // Either comment this line or add spring.sql.init.mode=never in application-test.yml
-//        inventoryRepository.saveAndFlush(new Inventory("P1", 5));
-
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testReserve() throws Exception {
-        int threadCount = 2;
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-
-        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
-
-        Runnable task = () -> {
-            try {
-                boolean result = inventoryService.reserveStock("P1", 2);
-                System.out.println(Thread.currentThread().getName() + " result = " + result);
-            } catch (ObjectOptimisticLockingFailureException e) {
-                System.out.println(Thread.currentThread().getName() + " failed due to optimistic lock");
-            } finally {
-                countDownLatch.countDown();
-            }
-        };
-
-        executorService.submit(task);
-        executorService.submit(task);
-
-        countDownLatch.await();
-
-        Inventory inventory = inventoryRepository.findById("P1").get();
-        System.out.println("Final Available quantity : " + inventory.getAvailableQuantity());
-
+    public void testInventoryService_SufficientStock() {
+        when(inventoryTxnService.reserveStock(anyString(), anyInt())).thenReturn(Boolean.TRUE);
+        Boolean result = inventoryService.reserveStockWithRetry("P1", 2);
+        Assertions.assertEquals(Boolean.TRUE, result);
     }
 
+    @Test
+    public void testInventoryService_InSufficientStock() {
+        when(inventoryTxnService.reserveStock(anyString(), anyInt())).thenReturn(Boolean.FALSE);
+        Boolean result = inventoryService.reserveStockWithRetry("P1", 6);
+        Assertions.assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    public void testInventoryService_Exception_2ndAttemptSucceed() {
+        when(inventoryTxnService.reserveStock(anyString(), anyInt()))
+                .thenThrow(new OptimisticLockException("1st attempt fail")) // 1st attempt
+                .thenReturn(Boolean.TRUE);                         // 2nd attempt
+        Boolean result = inventoryService.reserveStockWithRetry("P1", 4);
+        Assertions.assertEquals(Boolean.TRUE, result);
+    }
+
+    @Test
+    public void testInventoryService_Exception_3rdAttemptSucceed() {
+        when(inventoryTxnService.reserveStock(anyString(), anyInt()))
+                .thenThrow(new OptimisticLockException("1st attempt fail")) // 1st attempt
+                .thenThrow(new OptimisticLockException("2nd attempt fail")) // 2nd attempt
+                .thenReturn(Boolean.FALSE);                         // 3rd attempt
+        Boolean result = inventoryService.reserveStockWithRetry("P1", 6);
+        Assertions.assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    public void testInventoryService_Exception_AllAttemptsFail() {
+        when(inventoryTxnService.reserveStock(anyString(), anyInt()))
+                .thenThrow(new OptimisticLockException("1st attempt fail")) // 1st attempt
+                .thenThrow(new OptimisticLockException("2nd attempt fail")) // 2nd attempt
+                .thenThrow(new OptimisticLockException("3rd attempt fail"));                       // 3rd attempt
+        Assertions.assertThrows(OptimisticLockException.class,
+                () -> inventoryService.reserveStockWithRetry("P1", 6));
+    }
 }

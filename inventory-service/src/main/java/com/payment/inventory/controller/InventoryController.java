@@ -19,7 +19,7 @@ public class InventoryController {
 
     @PostMapping("/reserve")
     public ResponseEntity<String> reserve(@RequestParam String productId, @RequestParam int quantity) {
-        boolean success = inventoryService.reserveStock(productId, quantity);
+        boolean success = inventoryService.reserveStockWithRetry(productId, quantity);
         return success ? ResponseEntity.ok("Reserved") : ResponseEntity.badRequest().body("Insufficient stock");
     }
 

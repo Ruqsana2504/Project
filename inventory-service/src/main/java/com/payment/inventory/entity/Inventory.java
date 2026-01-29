@@ -21,13 +21,4 @@ public class Inventory {
     @Version
     private Long version;
 
-    public Inventory() {
-
-    }
-
-    public Inventory(String productId, int availableQuantity) {
-        this.productId = productId;
-        this.availableQuantity = availableQuantity;
-    }
-
 }

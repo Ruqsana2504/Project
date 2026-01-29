@@ -1,3 +1,6 @@
+ALTER TABLE inventory
+    ALTER COLUMN version SET DEFAULT 0;
+
 INSERT INTO INVENTORY (product_id, available_quantity)
 VALUES ('P1', 5);
 INSERT INTO INVENTORY (product_id, available_quantity)

@@ -16,7 +16,6 @@ spring:
     hibernate:
       ddl-auto: update # Ensure Hibernate is set to create/update the schema
     show-sql: true
-    database-platform: org.hibernate.dialect.H2Dialect
 
   # 1. Enable the console
   h2:
