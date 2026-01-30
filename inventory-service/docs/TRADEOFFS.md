@@ -589,3 +589,27 @@ InventoryService (Proxy)
 └── @Transactional NOT applied
 
 Maven 4+ does not support h2 db console, so used Maven 3+ for testing with H2 database console.
+
+Imagine:
+DB is down
+Inventory service is overloaded
+Lock keeps failing
+
+Retry will:
+Hammer DB
+Increase latency
+Cause cascading failure
+That’s where Circuit Breaker comes in.
+
+Interpretation:
+
+Retry 3 times for optimistic locking
+Open circuit if 50% failures
+Stay open for 10 seconds
+
+
+Circuit Breaker Logic:
+Look at last 10 calls
+If ≥5 fail, breaker OPENS
+For 10 seconds → reject all calls
+Then HALF-OPEN, allow 2 test calls
