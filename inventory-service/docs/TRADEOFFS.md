@@ -1,22 +1,26 @@
 # Design Tradeoffs
 
-This document outlines the major architectural and design decisions made in the Inventory Service, the alternatives 
-considered, and the tradeoffs involved. Tradeoff documentation helps future developers understand why certain 
+This document outlines the major architectural and design decisions made in the Inventory Service, the alternatives
+considered, and the tradeoffs involved. Tradeoff documentation helps future developers understand why certain
 choices were made and what implications they carry.
 It should explain the rationale and main quality attribute tradeoffs for the design decisions.
 
 1. Architecture Pattern
-**Decision:** Adopt a microservices architecture for the Inventory Service.
-Rationale: Microservices allow independent deployment, scalability, and separation of concerns for inventory-specific logic.
-They fit well if the system is expected to grow with multiple interacting services.
+   **Decision:** Adopt a microservices architecture for the Inventory Service.
+   Rationale: Microservices allow independent deployment, scalability, and separation of concerns for inventory-specific
+   logic.
+   They fit well if the system is expected to grow with multiple interacting services.
 
 Tradeoffs:
+
 # Pros
+
 Independent scaling of inventory operations
 Clear service boundary for responsibilities
 Technology flexibility per service
 
 # Cons
+
 Increased complexity in service communication
 More overhead with inter-service networking and monitoring
 Harder to maintain if the team is small and unfamiliar with microservices patterns
@@ -25,13 +29,16 @@ Harder to maintain if the team is small and unfamiliar with microservices patter
 
 Decision: Use a relational database (e.g., PostgreSQL) for inventory data.
 
-Rationale: Relational databases provide strong consistency and support complex queries, which is useful for inventory tracking, joining tables, and maintaining strict stock integrity.
+Rationale: Relational databases provide strong consistency and support complex queries, which is useful for inventory
+tracking, joining tables, and maintaining strict stock integrity.
 
 Tradeoffs:
 
-Strong consistency ensures accurate inventory counts, but relational databases can be harder to scale horizontally compared to NoSQL options.
+Strong consistency ensures accurate inventory counts, but relational databases can be harder to scale horizontally
+compared to NoSQL options.
 
-If the service grows extremely large with high write throughput, relational scaling becomes more costly and may require partitioning or sharding.
+If the service grows extremely large with high write throughput, relational scaling becomes more costly and may require
+partitioning or sharding.
 
 3. API Design: Synchronous vs Asynchronous
 
@@ -45,7 +52,8 @@ Simple implementation and predictable request lifecycle.
 
 But synchronous REST calls can introduce latency and become a bottleneck under heavy load.
 
-For high-throughput use cases (e.g., massive order spikes), asynchronous messaging (queues) could improve resilience, but at the cost of added infrastructure and complexity.
+For high-throughput use cases (e.g., massive order spikes), asynchronous messaging (queues) could improve resilience,
+but at the cost of added infrastructure and complexity.
 
 4. Caching Strategy
 
@@ -91,10 +99,10 @@ Extensive test suites can slow down CI/CD pipelines if not optimized.
 
 Summary
 
-Every design choice has tradeoffs. In this service, we prioritized correctness and maintainability (e.g., using relational databases and clear API contracts) while still aiming for scalability and performance where feasible (e.g., caching and microservices). These decisions make sense based on current requirements, but may need revisiting if the system evolves or load patterns change significantly.
-
-
-
+Every design choice has tradeoffs. In this service, we prioritized correctness and maintainability (e.g., using
+relational databases and clear API contracts) while still aiming for scalability and performance where feasible (e.g.,
+caching and microservices). These decisions make sense based on current requirements, but may need revisiting if the
+system evolves or load patterns change significantly.
 
 How will Order ↔ Inventory talk?
 
@@ -114,23 +122,19 @@ Industry standard
 
 Order Service
 |
-|  OrderCreatedEvent
+| OrderCreatedEvent
 ↓
 Inventory Service
 |
-|  InventoryReservedEvent
+| InventoryReservedEvent
 ↓
 Order Service
 |
-|  OrderConfirmedEvent
+| OrderConfirmedEvent
 
 If inventory fails:
 
 InventoryRejectedEvent → OrderCancelled
-
-
-
-
 
 What Happens WITHOUT @Transactional
 
@@ -146,7 +150,6 @@ inventory = findById(P1)  // gets 5
 
 🧪 Thread 2 (Order B)
 inventory = findById(P1)  // also gets 5
-
 
 ❌ Both see the same stock
 
@@ -164,14 +167,11 @@ You sold 4 items, but DB says:
 
 availableQuantity = 3
 
-
 ❌ Overselling
 ❌ Financial loss
 ❌ Broken inventory
 
 THIS is why inventory systems fail in production.
-
-
 
 🚨 Another Critical Case: Exception After Update
 
@@ -225,9 +225,9 @@ Called from another Spring bean
 
 this.reserveStock();
 
-“Without @Transactional, inventory updates are not atomic, leading to race conditions, overselling, and inconsistent state.
+“Without @Transactional, inventory updates are not atomic, leading to race conditions, overselling, and inconsistent
+state.
 @Transactional ensures isolation and rollback, which is critical in payment and inventory systems.”
-
 
 # Spring boot 4+ is not working with H2
 
@@ -257,7 +257,8 @@ Annotating the test with @Transactional caused all threads to share one transact
 
 Why we are not using synchronized
 “synchronized provides thread safety only within a JVM. synchronized fails in horizontal scaling.
-In a horizontally scaled system with multiple instances, each JVM has its own lock, so it cannot prevent concurrent updates to shared resources like a database.”
+In a horizontally scaled system with multiple instances, each JVM has its own lock, so it cannot prevent concurrent
+updates to shared resources like a database.”
 
 1️⃣ What should happen when optimistic locking fails?
 
@@ -298,7 +299,7 @@ One persistence context = one transaction = one thread
 
 Thread T1
 ├── Transaction
-│    └── Persistence Context (PC1)
+│ └── Persistence Context (PC1)
 │
 └── commit → flush → close PC
 
@@ -306,11 +307,10 @@ Thread T1 → Transaction → PC1
 Thread T2 → Transaction → PC2
 
 Pod A (JVM 1)          Pod B (JVM 2)
-─────────────         ─────────────
-Thread A1             Thread B1
-Transaction A         Transaction B
-PC_A                  PC_B
-
+───────────── ─────────────
+Thread A1 Thread B1
+Transaction A Transaction B
+PC_A PC_B
 
 Critical truth:
 
@@ -328,24 +328,24 @@ Critical truth:
 
 Thread T1 starts
 │
-│  @Transactional
-│  ┌──────────────────────────────────┐
-│  │  Transaction (TX1)               │
-│  │                                  │
-│  │  Persistence Context (PC1)       │
-│  │   ┌──────────────┐               │
-│  │   │ Inventory P1 │◄── managed    │
-│  │   │ qty = 5      │               │
-│  │   │ version = 1  │               │
-│  │   └──────────────┘               │
-│  │                                  │
-│  │  Dirty checking happens here     │
-│  │                                  │
-│  └──────────────────────────────────┘
+│ @Transactional
+│ ┌──────────────────────────────────┐
+│ │ Transaction (TX1)               │
+│ │ │
+│ │ Persistence Context (PC1)       │
+│ │ ┌──────────────┐ │
+│ │ │ Inventory P1 │◄── managed │
+│ │ │ qty = 5 │ │
+│ │ │ version = 1 │ │
+│ │ └──────────────┘ │
+│ │ │
+│ │ Dirty checking happens here │
+│ │ │
+│ └──────────────────────────────────┘
 │
-│  Commit
-│  ├── flush changes to DB
-│  └── close PC
+│ Commit
+│ ├── flush changes to DB
+│ └── close PC
 │
 Thread ends
 
@@ -355,27 +355,25 @@ Entity is managed
 Hibernate tracks changes
 Update happens automatically
 
-
-
 ASCII Diagram — NO @Transactional
 
 Thread T1
 │
-│  repo.findById()
-│  ┌────────────────────┐
-│  │ Temp TX            │
-│  │ Temp PC            │
-│  │  Inventory P1      │
-│  └────────────────────┘
+│ repo.findById()
+│ ┌────────────────────┐
+│ │ Temp TX │
+│ │ Temp PC │
+│ │ Inventory P1 │
+│ └────────────────────┘
 │
-│  PC closed ❌
+│ PC closed ❌
 │
-│  Inventory object now DETACHED
+│ Inventory object now DETACHED
 │
-│  inv.setAvailableQuantity(...)
+│ inv.setAvailableQuantity(...)
 │
-│  ❌ NO dirty checking
-│  ❌ NO auto update
+│ ❌ NO dirty checking
+│ ❌ NO auto update
 │
 Thread ends
 
@@ -386,30 +384,30 @@ No consistency guarantee
 
 Persistence Context (PC)
 ┌──────────────────────────┐
-│ Inventory (CURRENT)      │  ← you modify this
-│ qty = 5                  │
-│ version = 1              │
-│                          │
-│ Inventory (SNAPSHOT)     │  ← original DB state
-│ qty = 5                  │
-│ version = 1              │
+│ Inventory (CURRENT)      │ ← you modify this
+│ qty = 5 │
+│ version = 1 │
+│ │
+│ Inventory (SNAPSHOT)     │ ← original DB state
+│ qty = 5 │
+│ version = 1 │
 └──────────────────────────┘
 Dirty Checking + Version
 
 BEGIN TX
 │
-│  Load Inventory (v=1)
-│  ┌───────────────┐
-│  │ SNAPSHOT      │
-│  │ qty=5 v=1     │
-│  └───────────────┘
+│ Load Inventory (v=1)
+│ ┌───────────────┐
+│ │ SNAPSHOT │
+│ │ qty=5 v=1 │
+│ └───────────────┘
 │
-│  Change qty → 3
+│ Change qty → 3
 │
-│  COMMIT
-│  ├─ Compare SNAPSHOT vs CURRENT
-│  ├─ Generate UPDATE with version check
-│  └─ If rows=0 → OptimisticLockException
+│ COMMIT
+│ ├─ Compare SNAPSHOT vs CURRENT
+│ ├─ Generate UPDATE with version check
+│ └─ If rows=0 → OptimisticLockException
 │
 END TX
 
@@ -425,26 +423,24 @@ JVM memory is not
 
 This is why optimistic locking is cloud-safe.
 
-
-
 Happy Path Saga (ASCII Diagram)
 Client
 │
 ▼
 Order Service
-│  TX1: CREATE ORDER (PENDING)
+│ TX1: CREATE ORDER (PENDING)
 │
 ▼
 Inventory Service
-│  TX2: RESERVE STOCK
+│ TX2: RESERVE STOCK
 │
 ▼
 Payment Service
-│  TX3: DEBIT MONEY
+│ TX3: DEBIT MONEY
 │
 ▼
 Order Service
-│  TX4: MARK ORDER CONFIRMED
+│ TX4: MARK ORDER CONFIRMED
 │
 ▼
 SUCCESS 🎉
@@ -460,7 +456,6 @@ Inventory TX2 → PC2 → commit → close
 Payment TX3 → PC3 → commit → close
 Order TX4 → PC4 → commit → close
 
-
 ❌ PCs never overlap
 ❌ No shared memory
 
@@ -472,34 +467,32 @@ Client
 │
 ▼
 Order Service
-│  TX1: CREATE ORDER (PENDING) ✔
+│ TX1: CREATE ORDER (PENDING) ✔
 │
 ▼
 Inventory Service
-│  TX2: RESERVE STOCK ✔
+│ TX2: RESERVE STOCK ✔
 │
 ▼
 Payment Service
-│  TX3: DEBIT MONEY ❌ FAIL
-
+│ TX3: DEBIT MONEY ❌ FAIL
 
 Now what?
 
 7️⃣ Compensation Flow (CRITICAL)
 Payment Service
-│  TX3 failed
+│ TX3 failed
 │
 ▼
 Inventory Service
-│  TX4: RELEASE STOCK (COMPENSATION)
+│ TX4: RELEASE STOCK (COMPENSATION)
 │
 ▼
 Order Service
-│  TX5: MARK ORDER CANCELLED
+│ TX5: MARK ORDER CANCELLED
 │
 ▼
 CONSISTENCY RESTORED ✅
-
 
 This is the heart of Saga.
 
@@ -511,20 +504,14 @@ RESERVE STOCK
 │
 ▼
 DEBIT PAYMENT ──────┐
-│                │ FAIL
-▼                │
-CONFIRM ORDER       │
-                    ▼
-                RELEASE STOCK
-                    │                   
-                    ▼
-                CANCEL ORDER
-
-
-
-
-
-
+│ │ FAIL
+▼ │
+CONFIRM ORDER │
+▼
+RELEASE STOCK
+│                   
+▼
+CANCEL ORDER
 
 ) Orchestrated Saga (Controller Service)
 Saga Orchestrator
@@ -532,7 +519,6 @@ Saga Orchestrator
 ├── Order Service
 ├── Inventory Service
 └── Payment Service
-
 
 ✔ Easy to reason
 ✔ Central control
@@ -542,7 +528,6 @@ B) Choreographed Saga (Event-driven)
 OrderCreated → InventoryReserved → PaymentCompleted
 ↘ failure ↙
 Compensation events
-
 
 ✔ Scalable
 ✔ Loosely coupled
@@ -575,7 +560,6 @@ Order Service
 │
 ├─ cancel order
 
-
 ASCII Diagram — Retry Flow
 READ (v=1)
 │
@@ -599,7 +583,9 @@ Controller
 InventoryService (Proxy)
 │
 ├── reserveStockWithRetry()
-│        │
-│        └── reserveStock() ❌ bypasses proxy
+│ │
+│ └── reserveStock() ❌ bypasses proxy
 │
 └── @Transactional NOT applied
+
+Maven 4+ does not support h2 db console, so used Maven 3+ for testing with H2 database console.
