@@ -1,5 +1,6 @@
 package com.payment.inventory.service;
 
+import com.payment.inventory.dto.InventoryRequest;
 import com.payment.inventory.entity.Inventory;
 import com.payment.inventory.repository.InventoryRepository;
 import jakarta.persistence.OptimisticLockException;
@@ -31,7 +32,7 @@ public class InventoryTxnServiceTest {
 
         Runnable task = () -> {
             try {
-                boolean result = inventoryTxnService.reserveStock("P1", 2);
+                boolean result = inventoryTxnService.reserveStock(new InventoryRequest("P1", 2));
                 System.out.println(Thread.currentThread().getName() + " result = " + result);
             } catch (OptimisticLockException e) {
                 System.out.println(Thread.currentThread().getName() + " failed due to optimistic lock");
@@ -52,7 +53,7 @@ public class InventoryTxnServiceTest {
 
     @Test
     public void testReserve_InsufficientQuantity() {
-        boolean result = inventoryTxnService.reserveStock("P1", 6);
+        boolean result = inventoryTxnService.reserveStock(new InventoryRequest("P1", 6));
         System.out.println("Result for insufficient quantity: " + result);
     }
 

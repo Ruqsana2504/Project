@@ -1,5 +1,6 @@
 package com.payment.inventory.service;
 
+import com.payment.inventory.dto.InventoryRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
@@ -20,12 +21,12 @@ public class InventoryService {
             fallbackMethod = "reserveFallback"
     )
     @Transactional
-    public boolean reserveStockWithRetry(String productId, int quantity) {
-        return txService.reserveStock(productId, quantity);
+    public boolean reserveStockWithRetry(InventoryRequest inventoryRequest) {
+        return txService.reserveStock(inventoryRequest);
     }
 
-    public boolean reserveFallback(String productId, int quantity, Throwable ex) {
-        System.out.println("Inventory service degraded: " + ex.getMessage());
+    public boolean reserveFallback(InventoryRequest inventoryRequest, Throwable ex) {
+        System.out.println("Inventory service degraded: " + inventoryRequest.getProductId() + " " + ex.getMessage());
         return false;
     }
 

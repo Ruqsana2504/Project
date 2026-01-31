@@ -14,3 +14,9 @@ VALUES ('P5', 25);
 
 select *
 from inventory;
+
+
+INSERT INTO idempotency_keys (idempotency_key, response)
+VALUES ('123', 'SUCCESS:OrderCreated');
+INSERT INTO idempotency_keys (idempotency_key, response)
+VALUES ('124', 'SUCCESS:ReservationDone');
