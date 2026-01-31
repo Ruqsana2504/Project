@@ -22,3 +22,24 @@ spring:
     console:
       enabled: true
       path: /h2-console  # Spring boot 4+ is not working with H2
+
+resilience4j:
+  retry:
+    instances:
+      inventoryRetry:
+        max-attempts: 3
+        wait-duration: 100ms
+        retry-exceptions:
+          - jakarta.persistence.OptimisticLockException
+
+  circuitbreaker:
+    instances:
+      inventoryCB:
+        failure-rate-threshold: 50
+        sliding-window-size: 10
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+
+logging:
+  level:
+    org.hibernate.SQL: debug

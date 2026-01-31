@@ -1,5 +1,6 @@
 package com.payment.inventory.service;
 
+import com.payment.inventory.dto.InventoryRequest;
 import com.payment.inventory.entity.Inventory;
 import com.payment.inventory.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
@@ -14,16 +15,16 @@ public class InventoryTxnService {
     InventoryRepository inventoryRepository;
 
     @Transactional
-    protected boolean reserveStock(String productId, int quantity) {
+    protected boolean reserveStock(InventoryRequest inventoryRequest) {
 
-        Inventory inventory = inventoryRepository.findById(productId)
+        Inventory inventory = inventoryRepository.findById(inventoryRequest.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (inventory.getAvailableQuantity() < quantity) {
+        if (inventory.getAvailableQuantity() < inventoryRequest.getAvailableQuantity()) {
             return false;
         }
 
-        inventory.setAvailableQuantity(inventory.getAvailableQuantity() - quantity);
+        inventory.setAvailableQuantity(inventory.getAvailableQuantity() - inventoryRequest.getAvailableQuantity());
 
         System.out.println("Transaction active = " +
                 TransactionSynchronizationManager.isActualTransactionActive());

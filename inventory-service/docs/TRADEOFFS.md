@@ -607,9 +607,72 @@ Retry 3 times for optimistic locking
 Open circuit if 50% failures
 Stay open for 10 seconds
 
-
 Circuit Breaker Logic:
 Look at last 10 calls
 If ≥5 fail, breaker OPENS
 For 10 seconds → reject all calls
 Then HALF-OPEN, allow 2 test calls
+
+Client → Order Service → Inventory Service
+Now this happens 👇
+
+Client sends Reserve request
+InventoryService processes it
+Response gets LOST (network issue)
+Client retries SAME request
+
+❌ Without idempotency:
+Stock deducted twice
+Money charged twice
+Production incident 🚨
+💡 Retry + optimistic lock ≠ idempotency
+
+Same request → same result → applied only once
+
+Key rule:
+
+Business effect must happen ONCE
+Even if API is called N times
+
+Client
+|
+|--(Idempotency-Key)
+v
+Controller
+|
+|-- check key exists?
+|-- YES → return stored response
+|-- NO → call service
+|
+|-- reserve stock
+|
+store response + key
+
+❌ Don’t store huge responses
+Store status + reference ID
+Example: SUCCESS:ORDER_123
+
+❌ Don’t store forever
+Add TTL cleanup (cron/job)
+Usually 24–72 hours
+
+“Idempotency is implemented using a dedicated persistence entity keyed by an idempotency header.
+This guarantees exactly-once execution across retries, network failures, and horizontally scaled services.”
+
+“Idempotency records must be persisted in the same transaction as the business effect.
+Any rollback must rollback both, otherwise exactly-once semantics are broken.”
+
+“In Resilience4j, retry-exceptions apply only to retry logic.
+Circuit breakers treat all exceptions as failures unless explicitly restricted using record-exceptions or
+ignore-exceptions.”
+
+
+Method throws exception
+↓
+Spring AOP proxy intercepts
+↓
+Resilience4j decides → fallback()
+↓
+Fallback return value is sent back
+↓
+Exception NEVER reaches your catch

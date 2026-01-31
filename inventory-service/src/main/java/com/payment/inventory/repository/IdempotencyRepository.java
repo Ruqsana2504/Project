@@ -1,9 +1,9 @@
 package com.payment.inventory.repository;
 
-import com.payment.inventory.entity.Inventory;
+import com.payment.inventory.entity.IdempotencyRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InventoryRepository extends JpaRepository<Inventory, String> {
+public interface IdempotencyRepository extends JpaRepository<IdempotencyRecord, String> {
 }
