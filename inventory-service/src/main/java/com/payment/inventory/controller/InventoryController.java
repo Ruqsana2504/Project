@@ -31,7 +31,7 @@ public class InventoryController {
             return ResponseEntity.badRequest().body("Missing or empty idempotencyKey header");
         }
 
-        log.info("Received reserve request with idempotencyKey : {} for product : {}", idempotencyKey, requestBody.getProductId());
+        log.info("Received reserve request with idempotencyKey : {} for product : {}", idempotencyKey, requestBody.productId());
 
         Optional<IdempotencyRecord> record;
         try {
@@ -54,6 +54,38 @@ public class InventoryController {
         );
 
         return result;
+    }
+
+    @PostMapping("/release")
+    public ResponseEntity<Void> release(@RequestHeader("Idempotency-Key") String idempotencyKey,
+                                        @RequestBody InventoryRequest requestBody) throws Exception {
+
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            throw new IllegalAccessException("Missing or empty idempotencyKey header");
+        }
+
+        log.info("Received release request with idempotencyKey : {} for product : {}", idempotencyKey, requestBody.productId());
+
+        Optional<IdempotencyRecord> record;
+        try {
+            record = idempotencyRepository.findById(idempotencyKey);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalAccessException("Invalid idempotencyKey");
+        }
+
+        String response = "";
+        if (record.isPresent()) {
+            response = record.get().getResponse();
+        }
+
+        inventoryService.releaseStock(requestBody);
+
+        idempotencyRepository.save(
+                new IdempotencyRecord(idempotencyKey, response)
+        );
+
+        return ResponseEntity.ok().build();
+
     }
 
 }

@@ -19,16 +19,16 @@ public class InventoryTxnService {
     @Transactional
     protected boolean reserveStock(InventoryRequest inventoryRequest) {
 
-        Inventory inventory = inventoryRepository.findById(inventoryRequest.getProductId())
+        Inventory inventory = inventoryRepository.findById(inventoryRequest.productId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         log.debug("Inventory details retrieved: {}", inventory);
 
-        if (inventory.getAvailableQuantity() < inventoryRequest.getAvailableQuantity()) {
-            throw new InsufficientStockException("Insufficient stock for product: " + inventoryRequest.getProductId());
+        if (inventory.getAvailableQuantity() < inventoryRequest.availableQuantity()) {
+            throw new InsufficientStockException("Insufficient stock for product: " + inventoryRequest.productId());
         }
 
-        inventory.setAvailableQuantity(inventory.getAvailableQuantity() - inventoryRequest.getAvailableQuantity());
+        inventory.setAvailableQuantity(inventory.getAvailableQuantity() - inventoryRequest.availableQuantity());
 
         log.info("Transaction active = {} ", TransactionSynchronizationManager.isActualTransactionActive());
 
