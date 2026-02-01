@@ -22,9 +22,7 @@ public class Order {
     private String userId;
 
     private String productId;
-
     private int quantity;
-
     private BigDecimal amount;
 
     private String currency;
