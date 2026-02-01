@@ -712,3 +712,32 @@ ERROR → OPEN → HALF_OPEN → CLOSED
 Observe actuator
 GET /actuator/circuitbreakers
 GET /actuator/metrics/resilience4j.circuitbreaker.state
+
+
+[ Order Service ]
+|
+|-- CREATE_ORDER (PENDING)
+|
+v
+[ Inventory Service ]
+|
+|-- RESERVE_STOCK
+|
+v
+[ Payment Service ]
+|
+|-- PAYMENT SUCCESS?
+|        |
+|        |-- YES → ORDER CONFIRMED ✅
+|
+|-- NO
+|
+v
+[ Inventory Service ]
+|
+|-- RELEASE_STOCK (COMPENSATION)
+|
+v
+[ Order Service ]
+|
+|-- ORDER FAILED ❌
