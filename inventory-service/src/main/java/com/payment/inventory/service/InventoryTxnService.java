@@ -25,7 +25,7 @@ public class InventoryTxnService {
         log.debug("Inventory details retrieved: {}", inventory);
 
         if (inventory.getAvailableQuantity() < inventoryRequest.getAvailableQuantity()) {
-            return false;
+            throw new InsufficientStockException("Insufficient stock for product: " + inventoryRequest.getProductId());
         }
 
         inventory.setAvailableQuantity(inventory.getAvailableQuantity() - inventoryRequest.getAvailableQuantity());

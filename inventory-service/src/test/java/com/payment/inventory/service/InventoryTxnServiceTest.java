@@ -5,6 +5,7 @@ import com.payment.inventory.entity.Inventory;
 import com.payment.inventory.repository.InventoryRepository;
 import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +35,7 @@ public class InventoryTxnServiceTest {
 
         Runnable task = () -> {
             try {
-                boolean result = inventoryTxnService.reserveStock(new InventoryRequest("P1", 2));
+                boolean result = inventoryTxnService.reserveStock(new InventoryRequest("P1", 3));
                 log.info("{} result = {} ", Thread.currentThread().getName(), result);
             } catch (OptimisticLockException e) {
                 log.info(" {} failed due to optimistic lock.", Thread.currentThread().getName());
@@ -55,8 +56,7 @@ public class InventoryTxnServiceTest {
 
     @Test
     public void testReserve_InsufficientQuantity() {
-        boolean result = inventoryTxnService.reserveStock(new InventoryRequest("P1", 6));
-        log.info("Result for insufficient quantity: {}", result);
+        Assertions.assertThrows(InsufficientStockException.class, () -> inventoryTxnService.reserveStock(new InventoryRequest("P1", 6)));
     }
 
 }

@@ -708,3 +708,7 @@ GET http://localhost:8081/actuator/circuitbreakerevents
 You’ll literally see:
 
 ERROR → OPEN → HALF_OPEN → CLOSED
+
+Observe actuator
+GET /actuator/circuitbreakers
+GET /actuator/metrics/resilience4j.circuitbreaker.state
