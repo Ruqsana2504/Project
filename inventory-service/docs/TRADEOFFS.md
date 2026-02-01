@@ -676,3 +676,35 @@ Resilience4j decides → fallback()
 Fallback return value is sent back
 ↓
 Exception NEVER reaches your catch
+
+
+server.port = 8081
+🔍 Circuit Breaker state
+GET http://localhost:8081/actuator/circuitbreakers
+Example output:
+
+{
+"inventoryCB": {
+"state": "CLOSED",
+"failureRate": 20.0,
+"bufferedCalls": 5,
+"failedCalls": 1
+}
+}
+🔁 Retry metrics
+GET http://localhost:8081/actuator/retries
+Example:
+
+{
+"inventoryRetry": {
+"maxAttempts": 3,
+"successfulCallsWithoutRetry": 1,
+"successfulCallsWithRetry": 2,
+"failedCalls": 1
+}
+}
+📈 Live events (BEST for learning)
+GET http://localhost:8081/actuator/circuitbreakerevents
+You’ll literally see:
+
+ERROR → OPEN → HALF_OPEN → CLOSED

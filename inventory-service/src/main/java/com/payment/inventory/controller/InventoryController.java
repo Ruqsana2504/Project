@@ -4,11 +4,13 @@ import com.payment.inventory.dto.InventoryRequest;
 import com.payment.inventory.entity.IdempotencyRecord;
 import com.payment.inventory.repository.IdempotencyRepository;
 import com.payment.inventory.service.InventoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/inventory")
 public class InventoryController {
@@ -29,6 +31,8 @@ public class InventoryController {
             return ResponseEntity.badRequest().body("Missing or empty idempotencyKey header");
         }
 
+        log.info("Received reserve request with idempotencyKey : {} for product : {}", idempotencyKey, requestBody.getProductId());
+
         Optional<IdempotencyRecord> record;
         try {
             record = idempotencyRepository.findById(idempotencyKey);
@@ -48,6 +52,7 @@ public class InventoryController {
         idempotencyRepository.save(
                 new IdempotencyRecord(idempotencyKey, String.valueOf(result.getBody()))
         );
+
         return result;
     }
 

@@ -4,9 +4,11 @@ import com.payment.inventory.dto.InventoryRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class InventoryService {
 
@@ -22,11 +24,12 @@ public class InventoryService {
     )
     @Transactional
     public boolean reserveStockWithRetry(InventoryRequest inventoryRequest) {
+        log.info("Trying reserve for {}", inventoryRequest.getProductId());
         return txService.reserveStock(inventoryRequest);
     }
 
     public boolean reserveFallback(InventoryRequest inventoryRequest, Throwable ex) {
-        System.out.println("Inventory service degraded: " + inventoryRequest.getProductId() + " " + ex.getMessage());
+        log.info("Inventory service degraded : {} {}", inventoryRequest.getProductId(), ex.getMessage());
         return false;
     }
 

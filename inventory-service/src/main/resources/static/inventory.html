@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>Inventory Test</title>
+</head>
+<body>
+<h2>Inventory Reserve</h2>
+
+<button onclick="fireConcurrent()">Reserve Stock</button>
+
+<!--<script>-->
+<!--    function reserve() {-->
+<!--      fetch("http://localhost:8081/inventory/reserve", {-->
+<!--        method: "POST",-->
+<!--        headers: {-->
+<!--          "Content-Type": "application/json",-->
+<!--          "Idempotency-Key": crypto.randomUUID()-->
+<!--        },-->
+<!--        body: JSON.stringify({-->
+<!--          productId: "P1",-->
+<!--          quantity: 2-->
+<!--        })-->
+<!--      })-->
+<!--      .then(res => res.text())-->
+<!--      .then(console.log)-->
+<!--      .catch(console.error);-->
+<!--    }-->
+<!--</script>-->
+
+<script>
+    function fireConcurrent() {
+      for (let i = 0; i < 5; i++) {
+        fetch("http://localhost:8081/inventory/reserve", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Idempotency-Key": crypto.randomUUID()
+          },
+          body: JSON.stringify({
+            productId: "P1",
+            quantity: 1
+          })
+        })
+        .then(res => res.text())
+        .then(r => console.log("Response:", r))
+      }
+    }
+</script>
+</body>
+</html>
