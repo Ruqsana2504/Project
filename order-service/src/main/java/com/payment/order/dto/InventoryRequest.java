@@ -1,5 +1,4 @@
-package com.payment.inventory.dto;
+package com.payment.order.dto;
 
 public record InventoryRequest(String productId, int availableQuantity) {
-
 }

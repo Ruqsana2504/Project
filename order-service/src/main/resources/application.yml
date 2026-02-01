@@ -16,3 +16,9 @@ spring:
   h2:
     console:
       enabled: true
+
+#Logging Config for Debugging Purposes
+logging:
+  level:
+    root: DEBUG
+    org.springframework.web: DEBUG

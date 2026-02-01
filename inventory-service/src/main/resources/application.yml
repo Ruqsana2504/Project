@@ -23,6 +23,7 @@ spring:
       enabled: true
       path: /h2-console  # Spring boot 4+ is not working with H2
 
+#Retry Config
 resilience4j:
   retry:
     instances:
@@ -31,6 +32,13 @@ resilience4j:
         wait-duration: 100ms
         retry-exceptions:
           - jakarta.persistence.OptimisticLockException
+#            # Retry for almost everything
+  #            retry-exceptions:
+  #              - java.lang.Exception
+  #            # Explicitly skip these
+  #            ignore-exceptions:
+  #              - com.example.exceptions.BusinessValidationException
+  #              - jakarta.persistence.EntityNotFoundException
 
   circuitbreaker:
     instances:
@@ -42,4 +50,14 @@ resilience4j:
 
 logging:
   level:
-    org.hibernate.SQL: debug
+    root: DEBUG
+    org.springframework.web: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,retries,circuitbreakers,circuitbreakerevents
+  endpoint:
+    health:
+      show-details: always

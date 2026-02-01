@@ -2,12 +2,13 @@ package com.payment.order.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @Setter
+@ToString
 public class OrderRequest {
 
     private String userId;
@@ -21,7 +22,5 @@ public class OrderRequest {
     private String currency;
 
     private String idempotencyKey;
-
-    private Instant createdAt;
 
 }
