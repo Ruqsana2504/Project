@@ -4,15 +4,17 @@ import com.payment.order.utils.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "orders")
 @Getter
 @Setter
+@ToString
+@Table(name = "orders")
 public class Order {
 
     @Id
