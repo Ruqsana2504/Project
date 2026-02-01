@@ -1,7 +1,9 @@
-package com.payment.inventory.service;
+package com.payment.inventory.exception;
 
 public class InsufficientStockException extends RuntimeException {
+
     public InsufficientStockException(String message) {
         super(message);
     }
+    
 }

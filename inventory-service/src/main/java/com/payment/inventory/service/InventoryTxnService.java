@@ -2,6 +2,7 @@ package com.payment.inventory.service;
 
 import com.payment.inventory.dto.InventoryRequest;
 import com.payment.inventory.entity.Inventory;
+import com.payment.inventory.exception.InsufficientStockException;
 import com.payment.inventory.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
