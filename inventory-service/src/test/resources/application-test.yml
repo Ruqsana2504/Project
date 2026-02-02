@@ -17,10 +17,6 @@ spring:
       ddl-auto: create-drop # Ensure Hibernate is set to create/update the schema
     show-sql: true
 
-  sql:
-    init:
-      mode: always # Always initialize the database (for tests) for file based db
-
 resilience4j:
   retry:
     instances:

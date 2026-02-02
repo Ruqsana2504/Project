@@ -20,10 +20,6 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
-  sql:
-    init:
-      mode: never   # IMPORTANT → we control data via API
-
 #Retry Config
 resilience4j:
   retry:
@@ -33,7 +29,7 @@ resilience4j:
         wait-duration: 100ms
         retry-exceptions:
           - jakarta.persistence.OptimisticLockException
-#            # Retry for almost everything
+  #            # Retry for almost everything
   #            retry-exceptions:
   #              - java.lang.Exception
   #            # Explicitly skip these
@@ -49,6 +45,7 @@ resilience4j:
         wait-duration-in-open-state: 10s
         permitted-number-of-calls-in-half-open-state: 2
 
+#Logging Config for Debugging Purposes
 logging:
   level:
     root: DEBUG
