@@ -21,7 +21,7 @@ public class InventoryTxnService {
     protected boolean reserveStock(InventoryRequest inventoryRequest) {
 
         Inventory inventory = inventoryRepository.findById(inventoryRequest.productId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new InsufficientStockException("Product not found"));
 
         log.debug("Inventory details retrieved: {}", inventory);
 
@@ -31,7 +31,7 @@ public class InventoryTxnService {
 
         inventory.setAvailableQuantity(inventory.getAvailableQuantity() - inventoryRequest.availableQuantity());
 
-        log.info("Transaction active = {} ", TransactionSynchronizationManager.isActualTransactionActive());
+        log.info("Is Transaction active = {} ", TransactionSynchronizationManager.isActualTransactionActive());
 
         return true;
     }

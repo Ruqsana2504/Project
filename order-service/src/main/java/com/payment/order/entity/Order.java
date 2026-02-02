@@ -5,10 +5,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -18,13 +18,15 @@ import java.util.UUID;
 public class Order {
 
     @Id
-    @GeneratedValue
-    private UUID orderId;
+    @Column(name = "order_id", length = 36, nullable = false)
+    private String orderId;
 
     private String userId;
 
     private String productId;
+
     private int quantity;
+
     private BigDecimal amount;
 
     private String currency;
@@ -36,6 +38,8 @@ public class Order {
 
     private String idempotencyKey;
 
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
 }

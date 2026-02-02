@@ -1,5 +1,6 @@
 package com.payment.order.dto;
 
+import com.payment.order.utils.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,6 +12,8 @@ import java.math.BigDecimal;
 @ToString
 public class OrderRequest {
 
+    private String orderId;
+
     private String userId;
 
     private String productId;
@@ -20,6 +23,8 @@ public class OrderRequest {
     private BigDecimal amount;
 
     private String currency;
+
+    private OrderStatus orderStatus;
 
     private String idempotencyKey;
 

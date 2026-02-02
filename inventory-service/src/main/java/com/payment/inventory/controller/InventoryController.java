@@ -41,6 +41,7 @@ public class InventoryController {
         }
 
         if (record.isPresent()) {
+            log.debug("Idempotent request. Returning cached response for key: {} with response : {}", idempotencyKey, record.get());
             return ResponseEntity.ok(record.get().getResponse());
         }
 

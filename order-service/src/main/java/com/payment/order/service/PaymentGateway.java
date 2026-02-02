@@ -1,17 +1,15 @@
 package com.payment.order.service;
 
+import com.payment.order.exception.PaymentFailedException;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
 
 @Component
 public class PaymentGateway {
 
-    public boolean pay(BigDecimal amount) {
+    public void pay() {
         // simulate failure randomly
         if (Math.random() < 0.3) {
-            throw new RuntimeException("Payment failed");
+            throw new PaymentFailedException("Payment failed");
         }
-        return true;
     }
 }
