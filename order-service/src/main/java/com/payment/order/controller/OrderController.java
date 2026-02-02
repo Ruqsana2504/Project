@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @Slf4j
 @RestController
 @RequestMapping("/orders")
@@ -23,7 +21,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<String> createOrder(@RequestBody OrderRequest orderRequest) {
         log.debug("Received order request: {}", orderRequest);
-        UUID orderId = orderService.createOrder(orderRequest);
-        return ResponseEntity.ok("Order placed. ID = " + orderId);
+        OrderRequest order = orderService.createOrder(orderRequest);
+        return ResponseEntity.ok("Order created with ID: " + order.getOrderId() + " and Status: " + order.getOrderStatus());
     }
 }
