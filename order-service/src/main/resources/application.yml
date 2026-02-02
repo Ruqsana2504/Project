@@ -10,8 +10,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # dev only.Ensure Hibernate is set to create/update the schema
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
 
 
 #Logging Config for Debugging Purposes
