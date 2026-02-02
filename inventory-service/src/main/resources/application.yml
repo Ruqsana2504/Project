@@ -6,22 +6,23 @@ spring:
     name: inventory-service
 
   datasource:
-    url: jdbc:h2:mem:inventorydb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:mysql://localhost:3306/inventorydb
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
-    defer-datasource-initialization: true # Force data.sql to wait until JPA has created the tables
     hibernate:
-      ddl-auto: update # Ensure Hibernate is set to create/update the schema
+      ddl-auto: update   # dev only.Ensure Hibernate is set to create/update the schema
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
 
-  # 1. Enable the console
-  h2:
-    console:
-      enabled: true
-      path: /h2-console  # Spring boot 4+ is not working with H2
+  sql:
+    init:
+      mode: never   # IMPORTANT → we control data via API
 
 #Retry Config
 resilience4j:
