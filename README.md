@@ -534,5 +534,3 @@ Architecture diagram
 Interview stories
 
 Deliverable
-
-✅ Resume-ready project
