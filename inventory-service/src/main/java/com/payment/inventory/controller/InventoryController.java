@@ -88,5 +88,4 @@ public class InventoryController {
         return ResponseEntity.ok().build();
 
     }
-
 }
