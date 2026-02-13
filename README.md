@@ -22,7 +22,7 @@ Dockerized & deployment-ready
 
 Tech Stack:
 
-Java 17
+Java 25
 
 Spring Boot
 
