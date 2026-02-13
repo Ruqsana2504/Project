@@ -656,6 +656,8 @@ Example: SUCCESS:ORDER_123
 Add TTL cleanup (cron/job)
 Usually 24–72 hours
 
+
+
 “Idempotency is implemented using a dedicated persistence entity keyed by an idempotency header.
 This guarantees exactly-once execution across retries, network failures, and horizontally scaled services.”
 
@@ -665,6 +667,8 @@ Any rollback must rollback both, otherwise exactly-once semantics are broken.”
 “In Resilience4j, retry-exceptions apply only to retry logic.
 Circuit breakers treat all exceptions as failures unless explicitly restricted using record-exceptions or
 ignore-exceptions.”
+
+
 
 
 Method throws exception
