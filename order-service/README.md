@@ -11,8 +11,7 @@ It does NOT process payment
 It only records what should happen next
 Saga decides how.
 
-The Order Service stores the immutable intent of a user’s purchase and tracks the order state,
-while downstream services handle inventory and payment as part of a Saga.
+The Order Service stores the immutable intent of a user’s purchase and tracks the order state,while downstream services handle inventory and payment as part of a Saga.
 
 
 
